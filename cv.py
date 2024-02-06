@@ -4,6 +4,7 @@ from PIL import Image
 import os
 
 import google.generativeai as genai
+from langchain.prompts import PromptTemplate
 
 from dotenv import load_dotenv, dotenv_values  # we can use load_dotenv or dotenv_values both perform the same task
 
@@ -21,12 +22,10 @@ generation_config = {
   "max_output_tokens": 1024,
 }
 
-
 def main():
     st.title("Object Finder 🔍")
     
     disclaimer_message = """This is a object detector model so preferably use images containing different objects,tools... for best results 🙂"""
-    # disclaimer_message = """This is a object detector model so preferably use images containing different objects,tools... for best results 🙂"""
 
 
     # Hide the disclaimer initially
@@ -52,18 +51,18 @@ def main():
         if st.button("Identify the objects"):
 
             st.success("Detecting...")
+            company = "Dove"
+            prompt_template = f"You are a field officer for {company} company. You are there at the store to analyse product placement. Identify the products in the image. Make a JSON format with the keys as product name, count, shelf number."
+      
 
             vision_model = genai.GenerativeModel('gemini-pro-vision')
-            response = vision_model.generate_content(["Provide the product names, count, shelf number in a JSON format.",image])
+            response = vision_model.generate_content([prompt_template,image])
+            # Provide the product names, count, shelf number in a JSON format.
             # prompt = f"Identify the products in the image {uploaded_image.name}. Determine their relative positions considering factors like eye-level, visibility, lighting, bottom placement, and proximity to corners. Provide the product names, count, shelf number, and their positions in a JSON format."
 
 
             
             st.write("The objects detected are \n", response.text)
-
-            st.success("Thanks")
-
-            st.info("For trying out with another image just click on browse files, enjoy 😄!!!")
 
 
 if __name__ == "__main__":
